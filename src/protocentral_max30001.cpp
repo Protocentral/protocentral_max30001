@@ -150,16 +150,22 @@ void MAX30001::BeginBioZ()
 {
     max30001SwReset();
     delay(100);
-    max30001RegWrite(CNFG_GEN, 0x081007);
+    max30001RegWrite(CNFG_GEN, 0x0C1007); // BioZ Enabled 
     delay(100);
     max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
     delay(100);
+    max30001RegWrite(CNFG_BMUX,0x000000);
+    delay(100);
+
     max30001RegWrite(CNFG_EMUX,0x0B0000);
     delay(100);
     max30001RegWrite(CNFG_ECG, 0x805000);  // d23 - d22 : 10 for 250sps , 00:500 sps
     delay(100);
+    
+    //max30001RegWrite(CNFG_BIOZ, 0x);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    //delay(100);
 
-    max30001RegWrite(CNFG_RTOR1,0x3fc600);
+    //max30001RegWrite(CNFG_RTOR1,0x3fc600);
     max30001Synch();
     delay(100);
 }
