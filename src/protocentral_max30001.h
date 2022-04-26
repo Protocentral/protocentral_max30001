@@ -72,14 +72,16 @@ class MAX30001
   public:
   	unsigned int heartRate;
   	unsigned int RRinterval;
-  	signed long ecgdata;
+  	signed long ecg_data;
+    signed long bioz_data;
 
-    void max30001Begin();
+    void Begin();
     void max30001BeginRtorMode();
+    void BeginBioZ();
     void max30001SwReset(void);
     void getHRandRR(void);
-    void getECGSamples(void);
-    void getBioZSamples(void);
+    signed long getECGSamples(void);
+    signed long getBioZSamples(void);
     bool max30001ReadInfo(void);
     void max30001SetsamplingRate(uint16_t samplingRate);
     void max30001RegRead(uint8_t Reg_address, uint8_t * buff);

@@ -128,7 +128,7 @@ void MAX30001::max30001ReadData(int num_samples, uint8_t * readBuffer)
     digitalWrite(MAX30001_CS_PIN, HIGH);
 }
 
-void MAX30001::max30001Begin()
+void MAX30001::Begin()
 {
     max30001SwReset();
     delay(100);
@@ -138,7 +138,7 @@ void MAX30001::max30001Begin()
     delay(100);
     max30001RegWrite(CNFG_EMUX,0x0B0000);
     delay(100);
-    max30001RegWrite(CNFG_ECG, 0x805000);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    max30001RegWrite(CNFG_ECG, 0x825000);  // d23 - d22 : 10 for 250sps , 00:500 sps
     delay(100);
 
     max30001RegWrite(CNFG_RTOR1,0x3fc600);
@@ -155,6 +155,9 @@ void MAX30001::BeginBioZ()
     max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
     delay(100);
     max30001RegWrite(CNFG_BMUX,0x000000);
+    delay(100);
+
+    max30001RegWrite(CNFG_BIOZ, 0x0008F0);  // d23 - d22 : 10 for 250sps , 00:500 sps
     delay(100);
 
     max30001RegWrite(CNFG_EMUX,0x0B0000);
@@ -222,7 +225,7 @@ void MAX30001::max30001SetsamplingRate(uint16_t samplingRate)
     max30001RegWrite(CNFG_ECG, (cnfgEcg >> 8));
 }
 
-void  MAX30001::getECGSamples(void)
+signed long MAX30001::getECGSamples(void)
 {
     uint8_t regReadBuff[4];
     max30001RegRead(ECG_FIFO, regReadBuff);
@@ -236,13 +239,15 @@ void  MAX30001::getECGSamples(void)
     data2 = data2 & 0x03;
 
     unsigned long data = (unsigned long) (data0 | data1 | data2);
-    ecgdata = (signed long) (data);
+    ecg_data = (signed long) data;
+    return ecg_data;
 }
 
-void  MAX30001::getBioZSamples(void)
+signed long MAX30001::getBioZSamples(void)
 {
     uint8_t regReadBuff[4];
     max30001RegRead(BIOZ_FIFO, regReadBuff);
+    
 
     unsigned long data0 = (unsigned long) (regReadBuff[0]);
     data0 = data0 <<24;
@@ -253,7 +258,8 @@ void  MAX30001::getBioZSamples(void)
     data2 = data2 & 0x03;
 
     unsigned long data = (unsigned long) (data0 | data1 | data2);
-    ecgdata = (signed long) (data);
+    bioz_data = (signed long) (data);
+    return bioz_data;
 }
 
 

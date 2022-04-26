@@ -1,4 +1,4 @@
-# ProtoCentral MAX30001 Single-lead ECG Breakout Board
+# ProtoCentral MAX30001 ECG and Bio-Impedance Breakout Board
 
 ![ProtoCentral MAX30001 Single-channel ECG breakout](assets/max30001_brk.jpg)
 
