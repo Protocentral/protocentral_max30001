@@ -31,11 +31,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-#include<SPI.h>
+#include <SPI.h>
 #include "protocentral_max30001.h"
 
 MAX30001 max30001;
-
+signed long bioz_val=0;
+signed long ecg_val=0;
 
 void setup()
 {
@@ -62,13 +63,13 @@ void setup()
     }
 
     Serial.println("Initialising the chip ...");
-    max30001.max30001Begin();   // initialize MAX30001
+    max30001.BeginBioZ();   // initialize MAX30001
 }
 
 void loop()
 {
-    max30001.getECGSamples();   //It reads the ecg sample and stores it to max30001.ecgdata .
-
-    Serial.println(max30001.ecgdata);
-    delay(8);
+    //bioz_val = max30001.getBioZSamples();   //It reads the ecg sample and stores it to max30001.ecgdata .
+    ecg_val = max30001.getECGSamples();
+    Serial.println(ecg_val);
+    delay(4);
 }
