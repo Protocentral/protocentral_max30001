@@ -31,15 +31,18 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-#include<SPI.h>
+#include <SPI.h>
 #include "protocentral_max30001.h"
 
-#define CES_CMDIF_PKT_START_1   0x0A
-#define CES_CMDIF_PKT_START_2   0xFA
-#define CES_CMDIF_TYPE_DATA     0x02
-#define CES_CMDIF_PKT_STOP      0x0B
-#define DATA_LEN                0x0C
-#define ZERO                    0
+#define MAX30001_CS_PIN         7
+#define MAX30001_DELAY_SAMPLES  8 // Time between consecutive samples
+
+#define CES_CMDIF_PKT_START_1 0x0A
+#define CES_CMDIF_PKT_START_2 0xFA
+#define CES_CMDIF_TYPE_DATA 0x02
+#define CES_CMDIF_PKT_STOP 0x0B
+#define DATA_LEN 0x0C
+#define ZERO 0
 
 volatile char DataPacket[DATA_LEN];
 const char DataPacketFooter[2] = {ZERO, CES_CMDIF_PKT_STOP};
@@ -47,81 +50,83 @@ const char DataPacketHeader[5] = {CES_CMDIF_PKT_START_1, CES_CMDIF_PKT_START_2, 
 
 uint8_t data_len = 0x0C;
 
-#define MAX30001_CS_PIN 6
 MAX30001 max30001(MAX30001_CS_PIN);
 
-void sendDataThroughUART(void){
+signed long ecg_data;
+signed long bioz_data;
 
-  DataPacket[5] = max30001.ecg_data;
-  DataPacket[6] = max30001.ecg_data>>8;
-  DataPacket[7] = max30001.ecg_data>>16;
-  DataPacket[8] = max30001.ecg_data>>24;
+void sendData(signed long ecg_sample, signed long bioz_sample)
+{
 
-  DataPacket[9] =  max30001.bioz_data;
-  DataPacket[10] = max30001.bioz_data >>8;
-  DataPacket[11] = max30001.bioz_data>>16;
-  DataPacket[12] = max30001.bioz_data>>24;
+  DataPacket[5] = ecg_sample;
+  DataPacket[6] = ecg_sample >> 8;
+  DataPacket[7] = ecg_sample >> 16;
+  DataPacket[8] = ecg_sample >> 24;
 
-  DataPacket[13] = max30001.heartRate ;
-  DataPacket[14] = max30001.heartRate >>8;
+  DataPacket[9] = bioz_sample;
+  DataPacket[10] = bioz_sample >> 8;
+  DataPacket[11] = bioz_sample >> 16;
+  DataPacket[12] = bioz_sample >> 24;
+
+  DataPacket[13] = 0x00; // max30001.heartRate;
+  DataPacket[14] = 0x00; // max30001.heartRate >> 8;
   DataPacket[15] = 0x00;
   DataPacket[16] = 0x00;
-
-  //send packet header
-  for(int i=0; i<5; i++){
-
+  
+  // Send packet header (in ProtoCentral OpenView format)
+  for (int i = 0; i < 5; i++)
+  {
     Serial.write(DataPacketHeader[i]);
   }
 
-  //send 30003 data
-  for(int i=0; i<DATA_LEN; i++) // transmit the data
+  // Send the data payload
+  for (int i = 0; i < DATA_LEN; i++) // transmit the data
   {
     Serial.write(DataPacket[i]);
   }
 
-  //send packet footer
-  for(int i=0; i<2; i++){
-
+  // Send packet footer (in ProtoCentral OpenView format)
+  for (int i = 0; i < 2; i++)
+  {
     Serial.write(DataPacketFooter[i]);
   }
 }
 
-
 void setup()
 {
-    Serial.begin(57600); //Serial begin
+  Serial.begin(57600); // Serial begin
 
-    pinMode(MAX30001_CS_PIN,OUTPUT);
-    digitalWrite(MAX30001_CS_PIN,HIGH); //disable device
+  SPI.begin();
+  SPI.setBitOrder(MSBFIRST);
+  SPI.setDataMode(SPI_MODE0);
 
-    SPI.begin();
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setDataMode(SPI_MODE0);
-
-    bool ret = max30001.max30001ReadInfo();
-    if(ret){
-      Serial.println("MAX 30001 read ID Success");
-    }else{
-
-      while(!ret){
-        //stay here untill the issue is fixed.
-        ret = max30001.max30001ReadInfo();
-        Serial.println("Failed to read ID, please make sure all the pins are connected");
-        delay(5000);
-      }
+  bool ret = max30001.max30001ReadInfo();
+  if (ret)
+  {
+    Serial.println("MAX 30001 read ID Success");
+  }
+  else
+  {
+    while (!ret)
+    {
+      // stay here untill the issue is fixed.
+      ret = max30001.max30001ReadInfo();
+      Serial.println("Failed to read ID, please make sure all the pins are connected");
+      delay(5000);
     }
+  }
 
-    Serial.println("Initialising the chip ...");
-    max30001.BeginBioZ();   // initialize MAX30001
-    //max30001.Begin(); 
-
+  Serial.println("Initialising the chip ...");
+  max30001.BeginBioZ(); // initialize MAX30001
+                        // max30001.Begin();
 }
 
 void loop()
 {
-    max30001.getECGSamples();   //It reads the ecg sample and stores it to max30001.ecgdata .
-    //max30001.getHRandRR();   //It will store HR to max30001.heartRate and rr to max30001.RRinterval.
-    max30001.getBioZSamples();
-    sendDataThroughUART();
-    delay(8);
+  ecg_data = max30001.getECGSamples();
+  // max30001.getHRandRR();
+  bioz_data = max30001.getBioZSamples();
+  sendData(ecg_data, bioz_data);
+
+  delay(8);
 }
