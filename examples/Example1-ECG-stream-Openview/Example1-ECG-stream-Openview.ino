@@ -58,20 +58,20 @@ signed long bioz_data;
 void sendData(signed long ecg_sample, signed long bioz_sample)
 {
 
-  DataPacket[5] = ecg_sample;
-  DataPacket[6] = ecg_sample >> 8;
-  DataPacket[7] = ecg_sample >> 16;
-  DataPacket[8] = ecg_sample >> 24;
+  DataPacket[0] = ecg_sample;
+  DataPacket[1] = ecg_sample >> 8;
+  DataPacket[2] = ecg_sample >> 16;
+  DataPacket[3] = ecg_sample >> 24;
 
-  DataPacket[9] = bioz_sample;
-  DataPacket[10] = bioz_sample >> 8;
-  DataPacket[11] = bioz_sample >> 16;
-  DataPacket[12] = bioz_sample >> 24;
+  DataPacket[4] = bioz_sample;
+  DataPacket[5] = bioz_sample >> 8;
+  DataPacket[6] = bioz_sample >> 16;
+  DataPacket[7] = bioz_sample >> 24;
 
-  DataPacket[13] = 0x00; // max30001.heartRate;
-  DataPacket[14] = 0x00; // max30001.heartRate >> 8;
-  DataPacket[15] = 0x00;
-  DataPacket[16] = 0x00;
+  DataPacket[8] = 0x00; // max30001.heartRate;
+  DataPacket[9] = 0x00; // max30001.heartRate >> 8;
+  DataPacket[10] = 0x00;
+  DataPacket[11] = 0x00;
   
   // Send packet header (in ProtoCentral OpenView format)
   for (int i = 0; i < 5; i++)
@@ -128,5 +128,5 @@ void loop()
   bioz_data = max30001.getBioZSamples();
   sendData(ecg_data, bioz_data);
 
-  delay(8);
+  delay(8*2);
 }
