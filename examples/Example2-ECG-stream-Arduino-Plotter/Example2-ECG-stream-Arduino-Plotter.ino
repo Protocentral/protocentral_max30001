@@ -34,7 +34,10 @@
 #include <SPI.h>
 #include "protocentral_max30001.h"
 
-MAX30001 max30001;
+#define MAX30001_CS_PIN 6
+
+MAX30001 max30001(MAX30001_CS_PIN);
+
 signed long bioz_val=0;
 signed long ecg_val=0;
 
@@ -42,8 +45,8 @@ void setup()
 {
     Serial.begin(57600); //Serial begin
 
-    pinMode(MAX30001_CS_PIN,OUTPUT);
-    digitalWrite(MAX30001_CS_PIN,HIGH); //disable device
+    //pinMode(MAX30001_CS_PIN,OUTPUT);
+    //digitalWrite(MAX30001_CS_PIN,HIGH); //disable device
 
     SPI.begin();
     SPI.setBitOrder(MSBFIRST);
@@ -63,7 +66,7 @@ void setup()
     }
 
     Serial.println("Initialising the chip ...");
-    max30001.BeginBioZ();   // initialize MAX30001
+    max30001.Begin();   // initialize MAX30001
 }
 
 void loop()
@@ -71,5 +74,5 @@ void loop()
     //bioz_val = max30001.getBioZSamples();   //It reads the ecg sample and stores it to max30001.ecgdata .
     ecg_val = max30001.getECGSamples();
     Serial.println(ecg_val);
-    delay(4);
+    delay(8);
 }

@@ -31,13 +31,20 @@
 #include<SPI.h>
 #include "protocentral_max30001.h"
 
-void MAX30001::max30001RegWrite (unsigned char WRITE_ADDRESS, unsigned long data)
+MAX30001::MAX30001(int cs_pin)
+{
+    _cs_pin=cs_pin;
+    pinMode(_cs_pin, OUTPUT);
+    digitalWrite(_cs_pin,HIGH);
+
+}
+void MAX30001::_max30001RegWrite (unsigned char WRITE_ADDRESS, unsigned long data)
 {
     // now combine the register address and the command into one byte:
     byte dataToSend = (WRITE_ADDRESS<<1) | WREG;
 
      // take the chip select low to select the device:
-    digitalWrite(MAX30001_CS_PIN, LOW);
+    digitalWrite(_cs_pin, LOW);
 
     delay(2);
     SPI.transfer(dataToSend);
@@ -47,26 +54,26 @@ void MAX30001::max30001RegWrite (unsigned char WRITE_ADDRESS, unsigned long data
     delay(2);
 
     // take the chip select high to de-select:
-    digitalWrite(MAX30001_CS_PIN, HIGH);
+    digitalWrite(_cs_pin, HIGH);
 }
 
 
 void MAX30001::max30001SwReset(void)
 {
-    max30001RegWrite(SW_RST,0x000000);
+    _max30001RegWrite(SW_RST,0x000000);
     delay(100);
 }
 
-void MAX30001::max30001Synch(void)
+void MAX30001::_max30001Synch(void)
 {
-    max30001RegWrite(SYNCH,0x000000);
+    _max30001RegWrite(SYNCH,0x000000);
 }
 
 void MAX30001::max30001RegRead(uint8_t Reg_address, uint8_t * buff)
 {
     uint8_t spiTxBuff;
 
-    digitalWrite(MAX30001_CS_PIN, LOW);
+    digitalWrite(_cs_pin, LOW);
 
     spiTxBuff = (Reg_address<<1 ) | RREG;
     SPI.transfer(spiTxBuff); //Send register location
@@ -76,7 +83,7 @@ void MAX30001::max30001RegRead(uint8_t Reg_address, uint8_t * buff)
        buff[i] = SPI.transfer(0xff);
     }
 
-    digitalWrite(MAX30001_CS_PIN, HIGH);
+    digitalWrite(_cs_pin, HIGH);
 }
 
 bool MAX30001::max30001ReadInfo(void)
@@ -84,7 +91,7 @@ bool MAX30001::max30001ReadInfo(void)
     uint8_t spiTxBuff;
     uint8_t readBuff[4] ;
 
-    digitalWrite(MAX30001_CS_PIN, LOW);
+    digitalWrite(_cs_pin, LOW);
 
     spiTxBuff = (INFO << 1 ) | RREG;
     SPI.transfer(spiTxBuff); //Send register location
@@ -94,7 +101,7 @@ bool MAX30001::max30001ReadInfo(void)
        readBuff[i] = SPI.transfer(0xff);
     }
 
-    digitalWrite(MAX30001_CS_PIN, HIGH);
+    digitalWrite(_cs_pin, HIGH);
 
     if((readBuff[0]&0xf0) == 0x50 ){
 
@@ -112,10 +119,10 @@ bool MAX30001::max30001ReadInfo(void)
     return false;
 }
 
-void MAX30001::max30001ReadData(int num_samples, uint8_t * readBuffer)
+void MAX30001::_max30001ReadData(int num_samples, uint8_t * readBuffer)
 {
     uint8_t spiTxBuff;
-    digitalWrite(MAX30001_CS_PIN, LOW);
+    digitalWrite(_cs_pin, LOW);
 
     spiTxBuff = (ECG_FIFO_BURST<<1 ) | RREG;
     SPI.transfer(spiTxBuff); //Send register location
@@ -125,24 +132,24 @@ void MAX30001::max30001ReadData(int num_samples, uint8_t * readBuffer)
       readBuffer[i] = SPI.transfer(0x00);
     }
 
-    digitalWrite(MAX30001_CS_PIN, HIGH);
+    digitalWrite(_cs_pin, HIGH);
 }
 
 void MAX30001::Begin()
 {
     max30001SwReset();
     delay(100);
-    max30001RegWrite(CNFG_GEN, 0x081007);
+    _max30001RegWrite(CNFG_GEN, 0x081007);
     delay(100);
-    max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
+    _max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
     delay(100);
-    max30001RegWrite(CNFG_EMUX,0x0B0000);
+    _max30001RegWrite(CNFG_EMUX,0x0B0000);
     delay(100);
-    max30001RegWrite(CNFG_ECG, 0x825000);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    _max30001RegWrite(CNFG_ECG, 0x825000);  // d23 - d22 : 10 for 250sps , 00:500 sps
     delay(100);
 
-    max30001RegWrite(CNFG_RTOR1,0x3fc600);
-    max30001Synch();
+    _max30001RegWrite(CNFG_RTOR1,0x3fc600);
+    _max30001Synch();
     delay(100);
 }
 
@@ -150,26 +157,29 @@ void MAX30001::BeginBioZ()
 {
     max30001SwReset();
     delay(100);
-    max30001RegWrite(CNFG_GEN, 0x0C1007); // BioZ Enabled 
+    _max30001RegWrite(CNFG_GEN, 0x0C1004); // BioZ Enabled 
     delay(100);
-    max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
+    _max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
     delay(100);
-    max30001RegWrite(CNFG_BMUX,0x000000);
-    delay(100);
-
-    max30001RegWrite(CNFG_BIOZ, 0x0008F0);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    _max30001RegWrite(CNFG_BMUX,0x000000);
     delay(100);
 
-    max30001RegWrite(CNFG_EMUX,0x0B0000);
+    _max30001RegWrite(CNFG_BIOZ, 0x000310);  // d23 - d22 : 10 for 250sps , 00:500 sps // Current generator: 8 uA, 
     delay(100);
-    max30001RegWrite(CNFG_ECG, 0x805000);  // d23 - d22 : 10 for 250sps , 00:500 sps
+
+    _max30001RegWrite(CNFG_EMUX,0x0B0000);
     delay(100);
-    
-    //max30001RegWrite(CNFG_BIOZ, 0x);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    //_max30001RegWrite(CNFG_ECG, 0x805000);  // d23 - d22 : 10 for 250sps , 00:500 sps
     //delay(100);
 
-    //max30001RegWrite(CNFG_RTOR1,0x3fc600);
-    max30001Synch();
+    _max30001RegWrite(CNFG_ECG, 0x825000);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    delay(100);
+    
+    //_max30001RegWrite(CNFG_BIOZ, 0x);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    //delay(100);
+
+    //_max30001RegWrite(CNFG_RTOR1,0x3fc600);
+    _max30001Synch();
     delay(100);
 }
 
@@ -177,19 +187,19 @@ void MAX30001::max30001BeginRtorMode()
 {
     max30001SwReset();
     delay(100);
-    max30001RegWrite(CNFG_GEN, 0x080004);
+    _max30001RegWrite(CNFG_GEN, 0x080004);
     delay(100);
-    max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
+    _max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
     delay(100);
-    max30001RegWrite(CNFG_EMUX,0x0B0000);
+    _max30001RegWrite(CNFG_EMUX,0x0B0000);
     delay(100);
-    max30001RegWrite(CNFG_ECG, 0x805000);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    _max30001RegWrite(CNFG_ECG, 0x805000);  // d23 - d22 : 10 for 250sps , 00:500 sps
     delay(100);
-    max30001RegWrite(CNFG_RTOR1,0x3fc600);
+    _max30001RegWrite(CNFG_RTOR1,0x3fc600);
     delay(100);
-    max30001RegWrite(EN_INT, 0x000401);
+    _max30001RegWrite(EN_INT, 0x000401);
     delay(100);
-    max30001Synch();
+    _max30001Synch();
     delay(100);
 }
 
@@ -222,7 +232,7 @@ void MAX30001::max30001SetsamplingRate(uint16_t samplingRate)
 
     Serial.print(" cnfg ECG ");
     Serial.println((cnfgEcg));
-    max30001RegWrite(CNFG_ECG, (cnfgEcg >> 8));
+    _max30001RegWrite(CNFG_ECG, (cnfgEcg >> 8));
 }
 
 signed long MAX30001::getECGSamples(void)
@@ -248,7 +258,6 @@ signed long MAX30001::getBioZSamples(void)
     uint8_t regReadBuff[4];
     max30001RegRead(BIOZ_FIFO, regReadBuff);
     
-
     unsigned long data0 = (unsigned long) (regReadBuff[0]);
     data0 = data0 <<24;
     unsigned long data1 = (unsigned long) (regReadBuff[1]);

@@ -47,19 +47,20 @@ const char DataPacketHeader[5] = {CES_CMDIF_PKT_START_1, CES_CMDIF_PKT_START_2, 
 
 uint8_t data_len = 0x0C;
 
-MAX30001 max30001;
+#define MAX30001_CS_PIN 6
+MAX30001 max30001(MAX30001_CS_PIN);
 
 void sendDataThroughUART(void){
 
-  DataPacket[5] = max30001.ecgdata;
-  DataPacket[6] = max30001.ecgdata>>8;
-  DataPacket[7] = max30001.ecgdata>>16;
-  DataPacket[8] = max30001.ecgdata>>24;
+  DataPacket[5] = max30001.ecg_data;
+  DataPacket[6] = max30001.ecg_data>>8;
+  DataPacket[7] = max30001.ecg_data>>16;
+  DataPacket[8] = max30001.ecg_data>>24;
 
-  DataPacket[9] =  max30001.RRinterval ;
-  DataPacket[10] = max30001.RRinterval >>8;
-  DataPacket[11] = 0x00;
-  DataPacket[12] = 0x00;
+  DataPacket[9] =  max30001.bioz_data;
+  DataPacket[10] = max30001.bioz_data >>8;
+  DataPacket[11] = max30001.bioz_data>>16;
+  DataPacket[12] = max30001.bioz_data>>24;
 
   DataPacket[13] = max30001.heartRate ;
   DataPacket[14] = max30001.heartRate >>8;
@@ -111,14 +112,16 @@ void setup()
     }
 
     Serial.println("Initialising the chip ...");
-    max30001.max30001Begin();   // initialize MAX30001
+    max30001.BeginBioZ();   // initialize MAX30001
+    //max30001.Begin(); 
+
 }
 
 void loop()
 {
-    max30001.getEcgSamples();   //It reads the ecg sample and stores it to max30001.ecgdata .
-    max30001.getHRandRR();   //It will store HR to max30001.heartRate and rr to max30001.RRinterval.
-
+    max30001.getECGSamples();   //It reads the ecg sample and stores it to max30001.ecgdata .
+    //max30001.getHRandRR();   //It will store HR to max30001.heartRate and rr to max30001.RRinterval.
+    max30001.getBioZSamples();
     sendDataThroughUART();
     delay(8);
 }
