@@ -37,16 +37,17 @@
 #define MAX30001_CS_PIN         7
 #define MAX30001_DELAY_SAMPLES  8 // Time between consecutive samples
 
-#define CES_CMDIF_PKT_START_1 0x0A
-#define CES_CMDIF_PKT_START_2 0xFA
-#define CES_CMDIF_TYPE_DATA 0x02
-#define CES_CMDIF_PKT_STOP 0x0B
+#define PC_OV_CMDIF_PKT_START_1 0x0A
+#define PC_OV_CMDIF_PKT_START_2 0xFA
+#define PC_OV_CMDIF_TYPE_DATA 0x02
+#define PC_OV_CMDIF_PKT_STOP 0x0B
+
 #define DATA_LEN 0x0C
 #define ZERO 0
 
 volatile char DataPacket[DATA_LEN];
-const char DataPacketFooter[2] = {ZERO, CES_CMDIF_PKT_STOP};
-const char DataPacketHeader[5] = {CES_CMDIF_PKT_START_1, CES_CMDIF_PKT_START_2, DATA_LEN, ZERO, CES_CMDIF_TYPE_DATA};
+const char DataPacketFooter[2] = {ZERO, PC_OV_CMDIF_PKT_STOP};
+const char DataPacketHeader[5] = {PC_OV_CMDIF_PKT_START_1, PC_OV_CMDIF_PKT_START_2, DATA_LEN, ZERO, PC_OV_CMDIF_TYPE_DATA};
 
 uint8_t data_len = 0x0C;
 
@@ -94,7 +95,7 @@ void sendData(signed long ecg_sample, signed long bioz_sample)
 
 void setup()
 {
-  Serial.begin(57600); // Serial begin
+  Serial.begin(57600);
 
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
@@ -109,16 +110,14 @@ void setup()
   {
     while (!ret)
     {
-      // stay here untill the issue is fixed.
+      // Keep trying every 5 seconds
       ret = max30001.max30001ReadInfo();
       Serial.println("Failed to read ID, please make sure all the pins are connected");
       delay(5000);
     }
   }
 
-  Serial.println("Initialising the chip ...");
-  max30001.BeginBioZ(); // initialize MAX30001
-                        // max30001.Begin();
+  max30001.BeginECGBioZ(); // Start sampling in ECG and BioZ modes                     
 }
 
 void loop()

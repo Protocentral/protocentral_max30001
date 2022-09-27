@@ -37,22 +37,23 @@ public:
   signed long ecg_data;
   signed long bioz_data;
 
-  void Begin();
-  void max30001BeginRtorMode();
-  void BeginBioZ();
-  void max30001SwReset(void);
-  void getHRandRR(void);
+  void BeginECGOnly();
+  void BeginECGBioZ();
+  void BeginRtoRMode();
+  
   signed long getECGSamples(void);
   signed long getBioZSamples(void);
+  void getHRandRR(void);
+
   bool max30001ReadInfo(void);
   void max30001SetsamplingRate(uint16_t samplingRate);
-  void max30001RegRead(uint8_t Reg_address, uint8_t *buff);
-
+ 
 private:
   void _max30001ReadData(int num_samples, uint8_t *readBuffer);
-
   void _max30001Synch(void);
   void _max30001RegWrite(unsigned char WRITE_ADDRESS, unsigned long data);
+  void _max30001RegRead(uint8_t Reg_address, uint8_t *buff);
+  void _max30001SwReset(void);
 
   int _cs_pin;
 };

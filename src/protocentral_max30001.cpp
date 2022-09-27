@@ -37,14 +37,14 @@ MAX30001::MAX30001(int cs_pin)
     pinMode(_cs_pin, OUTPUT);
     digitalWrite(_cs_pin,HIGH);
 
+
 }
 void MAX30001::_max30001RegWrite (unsigned char WRITE_ADDRESS, unsigned long data)
 {
-    // now combine the register address and the command into one byte:
+    //Combine the register address and the command into one byte:
     byte dataToSend = (WRITE_ADDRESS<<1) | WREG;
 
-     // take the chip select low to select the device:
-    digitalWrite(_cs_pin, LOW);
+   digitalWrite(_cs_pin, LOW);
 
     delay(2);
     SPI.transfer(dataToSend);
@@ -53,23 +53,10 @@ void MAX30001::_max30001RegWrite (unsigned char WRITE_ADDRESS, unsigned long dat
     SPI.transfer(data);
     delay(2);
 
-    // take the chip select high to de-select:
     digitalWrite(_cs_pin, HIGH);
 }
 
-
-void MAX30001::max30001SwReset(void)
-{
-    _max30001RegWrite(SW_RST,0x000000);
-    delay(100);
-}
-
-void MAX30001::_max30001Synch(void)
-{
-    _max30001RegWrite(SYNCH,0x000000);
-}
-
-void MAX30001::max30001RegRead(uint8_t Reg_address, uint8_t * buff)
+void MAX30001::_max30001RegRead(uint8_t Reg_address, uint8_t * buff)
 {
     uint8_t spiTxBuff;
 
@@ -84,6 +71,17 @@ void MAX30001::max30001RegRead(uint8_t Reg_address, uint8_t * buff)
     }
 
     digitalWrite(_cs_pin, HIGH);
+}
+
+void MAX30001::_max30001SwReset(void)
+{
+    _max30001RegWrite(SW_RST,0x000000);
+    delay(100);
+}
+
+void MAX30001::_max30001Synch(void)
+{
+    _max30001RegWrite(SYNCH,0x000000);
 }
 
 bool MAX30001::max30001ReadInfo(void)
@@ -104,15 +102,13 @@ bool MAX30001::max30001ReadInfo(void)
     digitalWrite(_cs_pin, HIGH);
 
     if((readBuff[0]&0xf0) == 0x50 ){
-
-      Serial.println("max30001 is ready");
-      Serial.print("Rev ID:  ");
+      Serial.print("MAX30001 Detected. Rev ID:  ");
       Serial.println((readBuff[0]&0xf0));
 
       return true;
     }else{
 
-      Serial.println("max30001 read info error\n");
+      Serial.println("MAX30001 read info error\n");
       return false;
     }
 
@@ -135,9 +131,9 @@ void MAX30001::_max30001ReadData(int num_samples, uint8_t * readBuffer)
     digitalWrite(_cs_pin, HIGH);
 }
 
-void MAX30001::Begin()
+void MAX30001::BeginECGOnly()
 {
-    max30001SwReset();
+    _max30001SwReset();
     delay(100);
     _max30001RegWrite(CNFG_GEN, 0x081007);
     delay(100);
@@ -153,39 +149,33 @@ void MAX30001::Begin()
     delay(100);
 }
 
-void MAX30001::BeginBioZ()
+void MAX30001::BeginECGBioZ()
 {
-    max30001SwReset();
+    _max30001SwReset();
     delay(100);
-    _max30001RegWrite(CNFG_GEN, 0x0C1004); // BioZ Enabled 
+    _max30001RegWrite(CNFG_GEN, 0x0C1004); // ECG & BioZ Enabled 
     delay(100);
-    _max30001RegWrite(CNFG_CAL, 0x720000);  // 0x700000
+    _max30001RegWrite(CNFG_CAL, 0x720000);  // Calibration sources disabled
     delay(100);
-    _max30001RegWrite(CNFG_BMUX,0x000000);
-    delay(100);
-
-    _max30001RegWrite(CNFG_BIOZ, 0x000310);  // d23 - d22 : 10 for 250sps , 00:500 sps // Current generator: 8 uA, 
-    delay(100);
-
-    _max30001RegWrite(CNFG_EMUX,0x0B0000);
-    delay(100);
-    //_max30001RegWrite(CNFG_ECG, 0x805000);  // d23 - d22 : 10 for 250sps , 00:500 sps
-    //delay(100);
 
     _max30001RegWrite(CNFG_ECG, 0x825000);  // d23 - d22 : 10 for 250sps , 00:500 sps
     delay(100);
-    
-    //_max30001RegWrite(CNFG_BIOZ, 0x);  // d23 - d22 : 10 for 250sps , 00:500 sps
-    //delay(100);
+    _max30001RegWrite(CNFG_EMUX,0x0B0000); // Pins internally connection to ECG Channels
+    delay(100);
+
+    _max30001RegWrite(CNFG_BIOZ, 0x000310);  // BioZ channel config: Current generator: 8 uA
+    delay(100);
+    _max30001RegWrite(CNFG_BMUX,0x000000);  // Pins connected internally to BioZ channels
+    delay(100);
 
     //_max30001RegWrite(CNFG_RTOR1,0x3fc600);
     _max30001Synch();
     delay(100);
 }
 
-void MAX30001::max30001BeginRtorMode()
+void MAX30001::BeginRtoRMode()
 {
-    max30001SwReset();
+    _max30001SwReset();
     delay(100);
     _max30001RegWrite(CNFG_GEN, 0x080004);
     delay(100);
@@ -207,7 +197,7 @@ void MAX30001::max30001BeginRtorMode()
 void MAX30001::max30001SetsamplingRate(uint16_t samplingRate)
 {
     uint8_t regBuff[4] = {0};
-    max30001RegRead(CNFG_ECG, regBuff);
+    _max30001RegRead(CNFG_ECG, regBuff);
 
     switch(samplingRate){
         case SAMPLINGRATE_128:
@@ -223,7 +213,7 @@ void MAX30001::max30001SetsamplingRate(uint16_t samplingRate)
             break;
 
         default :
-            Serial.println("Wrong samplingRate, please choose between 128, 256 or 512");
+            Serial.println("Invalid sample rate. Please choose between 128, 256 or 512");
             break;
     }
 
@@ -238,7 +228,7 @@ void MAX30001::max30001SetsamplingRate(uint16_t samplingRate)
 signed long MAX30001::getECGSamples(void)
 {
     uint8_t regReadBuff[4];
-    max30001RegRead(ECG_FIFO, regReadBuff);
+    _max30001RegRead(ECG_FIFO, regReadBuff);
 
     unsigned long data0 = (unsigned long) (regReadBuff[0]);
     data0 = data0 <<24;
@@ -256,7 +246,7 @@ signed long MAX30001::getECGSamples(void)
 signed long MAX30001::getBioZSamples(void)
 {
     uint8_t regReadBuff[4];
-    max30001RegRead(BIOZ_FIFO, regReadBuff);
+    _max30001RegRead(BIOZ_FIFO, regReadBuff);
     
     unsigned long data0 = (unsigned long) (regReadBuff[0]);
     data0 = data0 <<24;
@@ -275,7 +265,7 @@ signed long MAX30001::getBioZSamples(void)
 void MAX30001::getHRandRR(void)
 {
     uint8_t regReadBuff[4];
-    max30001RegRead(RTOR, regReadBuff);
+    _max30001RegRead(RTOR, regReadBuff);
 
     unsigned long RTOR_msb = (unsigned long) (regReadBuff[0]);
     unsigned char RTOR_lsb = (unsigned char) (regReadBuff[1]);
