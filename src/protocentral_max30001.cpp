@@ -153,19 +153,19 @@ void MAX30001::BeginECGBioZ()
 {
     _max30001SwReset();
     delay(100);
-    _max30001RegWrite(CNFG_GEN, 0x0C1004); // ECG & BioZ Enabled 
+    _max30001RegWrite(CNFG_GEN, 0x0C0004); // ECG & BioZ Enabled , FMSTR = 32768
     delay(100);
     _max30001RegWrite(CNFG_CAL, 0x720000);  // Calibration sources disabled
     delay(100);
 
-    _max30001RegWrite(CNFG_ECG, 0x825000);  // d23 - d22 : 10 for 250sps , 00:500 sps
+    _max30001RegWrite(CNFG_ECG, 0x825000);  // ECG_RATE: 125 SPS, 
     delay(100);
     _max30001RegWrite(CNFG_EMUX,0x0B0000); // Pins internally connection to ECG Channels
     delay(100);
 
-    _max30001RegWrite(CNFG_BIOZ, 0x000310);  // BioZ channel config: Current generator: 8 uA
+    _max30001RegWrite(CNFG_BIOZ, 0x201433);  // BioZ Rate: 64 SPS | Current generator: 32 uA
     delay(100);
-    _max30001RegWrite(CNFG_BMUX,0x000000);  // Pins connected internally to BioZ channels
+    _max30001RegWrite(CNFG_BMUX,0x000040);  // Pins connected internally to BioZ channels
     delay(100);
 
     //_max30001RegWrite(CNFG_RTOR1,0x3fc600);
