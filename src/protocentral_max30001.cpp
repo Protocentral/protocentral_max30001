@@ -1,3 +1,10 @@
+// ______          _        _____            _             _ 
+// | ___ \        | |      /  __ \          | |           | |
+// | |_/ / __ ___ | |_ ___ | /  \/ ___ _ __ | |_ _ __ __ _| |
+// |  __/ '__/ _ \| __/ _ \| |    / _ \ '_ \| __| '__/ _` | |
+// | |  | | | (_) | || (_) | \__/\  __/ | | | |_| | | (_| | |
+// \_|  |_|  \___/ \__\___/ \____/\___|_| |_|\__|_|  \__,_|_|                                  
+                                                          
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Demo code for the MAX30001 breakout board
@@ -13,7 +20,7 @@
 //  | VCC              | Digital VDD          |  +5V             |
 //  | GND              | Digital Gnd          |  Gnd             |
 //  | FCLK             | 32K CLOCK            |  -               |
-//  | INT1             | Interrupt1           |  02               |
+//  | INT1             | Interrupt1           |  02              |
 //  | INT2             | Interrupt2           |  -               |
 //
 //  This software is licensed under the MIT License(http://opensource.org/licenses/MIT).
