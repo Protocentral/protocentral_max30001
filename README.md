@@ -2,7 +2,7 @@
 
 ![ProtoCentral MAX30001 ECG and Respiration/Bio-Impedance Breakout Board](assets/max30001_brk.jpg)
 
-If you dont already have one, you can buy [ProtoCentral MAX30001 ECG and Respiration/Bio-Impedance Breakout Board here.](https://www.protocentral.com/open-medical-devices/1149-protocentral-max30001-single-lead-ecg-breakout-board.html)
+If you dont already have one, you can buy [ProtoCentral MAX30001 ECG and Respiration/Bio-Impedance Breakout Board here.](assets/max30001_breakout.jpg)
 
 
 MAX30001 is a single-lead ECG monitoring IC which has built-in R-R detection and several other features that make it perfect for a wearable single-lead ECG application.  
@@ -63,7 +63,7 @@ Open up your Arduino IDE and run the Arudino sketch (.ino) file in the archive t
 
 The GUI for visualizing the ECG and Respiration as well as parameters like Heart rate and Respiration rate is written in Processing, based on Java and is cross-compilable across platforms.
 
-![Wearing the Electrode](assets/gif-max30001-openview.gif)
+![Wearing the Electrode](assets/Protocentral_OpenView-max30001.mp4)
 
 Java 8 is required on all platforms for running the processing-based GUI application. You can download Java for your platform from the [Official Java website](https://www.java.com/en/download/).
 
