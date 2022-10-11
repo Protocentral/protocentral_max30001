@@ -63,7 +63,7 @@ Open up your Arduino IDE and run the Arudino sketch (.ino) file in the archive t
 
 The GUI for visualizing the ECG and Respiration as well as parameters like Heart rate and Respiration rate is written in Processing, based on Java and is cross-compilable across platforms.
 
-![Wearing the Electrode](assets/Protocentral_OpenView-max30001.mp4)
+[Protocentral_OpenView max30001](assets/Protocentral_OpenView-max30001.mp4)
 
 Java 8 is required on all platforms for running the processing-based GUI application. You can download Java for your platform from the [Official Java website](https://www.java.com/en/download/).
 
