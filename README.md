@@ -1,8 +1,8 @@
-# ProtoCentral MAX30001 ECG and Bio-Impedance Breakout Board
+# ProtoCentral MAX30001 ECG and Respiration/Bio-Impedance Breakout Board
 
-![ProtoCentral MAX30001 Single-channel ECG breakout](assets/max30001_brk.jpg)
+![ProtoCentral MAX30001 ECG and Respiration/Bio-Impedance Breakout Board](assets/max30001_brk.jpg)
 
-If you dont already have one, you can buy [ProtoCentral MAX30001 breakout here.](https://www.protocentral.com/open-medical-devices/1149-protocentral-max30001-single-lead-ecg-breakout-board.html)
+If you dont already have one, you can buy [ProtoCentral MAX30001 ECG and Respiration/Bio-Impedance Breakout Board here.](https://www.protocentral.com/open-medical-devices/1149-protocentral-max30001-single-lead-ecg-breakout-board.html)
 
 
 MAX30001 is a single-lead ECG monitoring IC which has built-in R-R detection and several other features that make it perfect for a wearable single-lead ECG application.  
@@ -23,7 +23,7 @@ The best feature of this chip though is the built-in R-R detection algorithm whi
 
 # What's included
 
-* ProtoCentral MAX30001 Breakout board
+* ProtoCentral MAX30001 ECG and Respiration/Bio-Impedance Breakout Board
 * Straight pin headers
 * 2-electrode ECG connector with stereo connector
 * 10x disposable ECG stick-on electrodes
