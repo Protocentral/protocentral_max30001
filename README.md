@@ -13,13 +13,17 @@ The best feature of this chip though is the built-in R-R detection algorithm whi
 
 # Features
 
-* MAX30001 IC on-board
-* Single-lead ECG monitoring
-* R-R peak detection for heart rate computation
-* High DC Offset range
-* Heart Rate computation using Pan-Tompkins algorithm
-* On-board level translator for 5V-tolerant operation
-* On-board low-noise 1.8V and 3.3V voltage regulator
+* MAX30001 single channel integrated front-end (AFE) chip
+* Single-lead ECG monitoring ( three electrodes, optional right leg drive)
+* Capable of measuring respiration
+* Clinical-Grade ECG and BioZ AFE with High Resolution
+* Inbuilt R-R detection and Pace detection
+* Flexibility for 2 or 3 electrode measurements
+* ADC Resolution is 18 bits 
+* High DC Offset range of ±650mV(excellent tolerance to motion artifacts)
+* Onboard 3.3V voltage regulator for low noise.
+* Onboard logic level translators for Arduino interface.
+
 
 # What's included
 
